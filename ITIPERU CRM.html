@@ -1,0 +1,929 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Panel Comercial – ITIPERU</title>
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+  :root {
+    --bg: #f5f4f0;
+    --surface: #ffffff;
+    --surface1: #f5f4f0;
+    --border: #e0dfd8;
+    --border-strong: #c8c7be;
+    --text: #1a1a18;
+    --text-sec: #5a5955;
+    --text-muted: #9a9890;
+    --accent: #1a6be0;
+    --accent-bg: #e8f0fc;
+    --accent-text: #1245a0;
+    --success: #1a8f5a;
+    --success-bg: #e6f5ee;
+    --success-text: #0e6040;
+    --warning: #a07010;
+    --warning-bg: #fef6e0;
+    --warning-text: #7a5008;
+    --danger: #c03030;
+    --danger-bg: #fde8e8;
+    --danger-text: #8c1c1c;
+    --pro: #6840c0;
+    --pro-bg: #f0ebfa;
+    --pro-text: #4a2a98;
+    --radius: 8px;
+    --shadow: 0 1px 4px rgba(0,0,0,.06), 0 0 0 0.5px rgba(0,0,0,.08);
+  }
+  body {
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+    background: var(--bg);
+    color: var(--text);
+    font-size: 14px;
+    min-height: 100vh;
+  }
+
+  /* HEADER */
+  .header {
+    background: var(--surface);
+    border-bottom: 0.5px solid var(--border);
+    padding: 0 24px;
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    height: 52px;
+    position: sticky;
+    top: 0;
+    z-index: 100;
+  }
+  .logo {
+    font-size: 16px;
+    font-weight: 600;
+    color: var(--accent);
+    letter-spacing: -.02em;
+  }
+  .logo span { color: var(--text); }
+  .header-date { font-size: 12px; color: var(--text-muted); margin-left: auto; }
+
+  /* LAYOUT */
+  .layout { display: flex; min-height: calc(100vh - 52px); }
+  .sidebar {
+    width: 200px;
+    flex-shrink: 0;
+    background: var(--surface);
+    border-right: 0.5px solid var(--border);
+    padding: 16px 0;
+    position: sticky;
+    top: 52px;
+    height: calc(100vh - 52px);
+    overflow-y: auto;
+  }
+  .nav-label {
+    font-size: 10px;
+    font-weight: 600;
+    color: var(--text-muted);
+    letter-spacing: .08em;
+    padding: 0 16px;
+    margin-bottom: 4px;
+    margin-top: 16px;
+  }
+  .nav-item {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 8px 16px;
+    font-size: 13px;
+    color: var(--text-sec);
+    cursor: pointer;
+    border: none;
+    background: none;
+    width: 100%;
+    text-align: left;
+    border-radius: 0;
+    transition: background .1s, color .1s;
+  }
+  .nav-item:hover { background: var(--bg); color: var(--text); }
+  .nav-item.active { background: var(--accent-bg); color: var(--accent-text); font-weight: 500; }
+  .nav-icon { font-size: 15px; width: 18px; text-align: center; }
+
+  .main { flex: 1; padding: 24px; max-width: 900px; }
+
+  /* PANELS */
+  .panel { display: none; }
+  .panel.active { display: block; }
+
+  /* PAGE TITLE */
+  .page-title { font-size: 18px; font-weight: 600; margin-bottom: 4px; }
+  .page-sub { font-size: 13px; color: var(--text-sec); margin-bottom: 20px; }
+
+  /* CARDS */
+  .card {
+    background: var(--surface);
+    border-radius: 12px;
+    border: 0.5px solid var(--border);
+    padding: 16px 20px;
+    box-shadow: var(--shadow);
+  }
+
+  /* METRICS GRID */
+  .metrics { display: grid; grid-template-columns: repeat(4, 1fr); gap: 10px; margin-bottom: 20px; }
+  .metric { background: var(--surface); border-radius: var(--radius); padding: 14px 16px; border: 0.5px solid var(--border); }
+  .metric-label { font-size: 11px; color: var(--text-muted); margin-bottom: 6px; }
+  .metric-value { font-size: 26px; font-weight: 600; }
+  .metric-sub { font-size: 11px; color: var(--text-muted); margin-top: 2px; }
+  .metric.accent { background: var(--accent-bg); border-color: #bfd0f5; }
+  .metric.accent .metric-value { color: var(--accent-text); }
+  .metric.success { background: var(--success-bg); border-color: #b0dfc8; }
+  .metric.success .metric-value { color: var(--success-text); }
+  .metric.warning { background: var(--warning-bg); }
+  .metric.warning .metric-value { color: var(--warning-text); }
+
+  /* PROGRESS BARS */
+  .prog-list { display: flex; flex-direction: column; gap: 8px; margin-bottom: 24px; }
+  .prog-item { background: var(--surface); border-radius: var(--radius); padding: 12px 16px; border: 0.5px solid var(--border); }
+  .prog-header { display: flex; justify-content: space-between; font-size: 12px; color: var(--text-sec); margin-bottom: 8px; }
+  .prog-track { background: var(--bg); border-radius: 4px; height: 5px; }
+  .prog-bar { height: 5px; border-radius: 4px; background: var(--accent); transition: width .4s; }
+  .prog-bar.success { background: var(--success); }
+  .prog-bar.warning { background: var(--warning); }
+
+  /* COUNTERS */
+  .counters { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+  .counter-card { background: var(--surface); border-radius: var(--radius); padding: 12px 14px; border: 0.5px solid var(--border); }
+  .counter-title { font-size: 11px; color: var(--text-muted); margin-bottom: 8px; }
+  .counter-row { display: flex; align-items: center; gap: 8px; }
+  .counter-btn { width: 28px; height: 28px; border: 0.5px solid var(--border-strong); border-radius: 4px; background: var(--bg); cursor: pointer; font-size: 16px; color: var(--text-sec); display: flex; align-items: center; justify-content: center; flex-shrink: 0; transition: background .1s; }
+  .counter-btn:hover { background: var(--border); }
+  .counter-num { flex: 1; text-align: center; font-size: 18px; font-weight: 600; }
+
+  /* SECTION TITLE */
+  .sec-title { font-size: 12px; font-weight: 600; color: var(--text-muted); letter-spacing: .05em; margin-bottom: 10px; margin-top: 22px; }
+
+  /* FLOW */
+  .flow { display: flex; flex-direction: column; }
+  .flow-row { display: flex; gap: 0; }
+  .flow-left { display: flex; flex-direction: column; align-items: center; width: 36px; flex-shrink: 0; }
+  .flow-dot {
+    width: 14px; height: 14px; border-radius: 50%;
+    background: var(--border-strong);
+    flex-shrink: 0; margin-top: 16px;
+    border: 2px solid var(--surface);
+    position: relative; z-index: 1;
+    transition: background .2s;
+  }
+  .flow-dot.done { background: var(--success); }
+  .flow-dot.active { background: var(--accent); box-shadow: 0 0 0 3px var(--accent-bg); }
+  .flow-line { width: 1px; background: var(--border); flex: 1; }
+  .flow-card {
+    flex: 1; background: var(--surface); border-radius: var(--radius);
+    padding: 12px 16px; margin: 4px 0; border: 0.5px solid var(--border);
+    cursor: pointer; transition: border-color .15s, background .15s;
+  }
+  .flow-card:hover { border-color: var(--accent); }
+  .flow-card.active { border-color: var(--accent); background: var(--accent-bg); }
+  .flow-card.done { opacity: .65; }
+  .flow-num { font-size: 11px; color: var(--text-muted); margin-bottom: 2px; }
+  .flow-title { font-size: 14px; font-weight: 500; }
+  .flow-card.active .flow-title { color: var(--accent-text); }
+  .flow-desc { font-size: 12px; color: var(--text-sec); margin-top: 4px; line-height: 1.5; }
+  .flow-actions { margin-top: 10px; display: flex; gap: 6px; }
+  .btn-done { font-size: 11px; padding: 5px 12px; border: 0.5px solid var(--success); border-radius: 4px; background: var(--success-bg); color: var(--success-text); cursor: pointer; font-family: inherit; }
+  .btn-done:hover { background: #c8eedd; }
+
+  /* CRM */
+  .crm-toolbar { display: flex; gap: 8px; margin-bottom: 12px; flex-wrap: wrap; }
+  .crm-toolbar input, .crm-toolbar select {
+    font-size: 13px; padding: 7px 10px;
+    border-radius: var(--radius); border: 0.5px solid var(--border);
+    background: var(--surface); color: var(--text);
+    font-family: inherit; outline: none;
+  }
+  .crm-toolbar input { flex: 1; min-width: 160px; }
+  .crm-toolbar input:focus, .crm-toolbar select:focus { border-color: var(--accent); }
+  .btn-add {
+    font-size: 13px; padding: 7px 14px;
+    background: var(--accent); color: #fff;
+    border: none; border-radius: var(--radius);
+    cursor: pointer; font-family: inherit; white-space: nowrap;
+    transition: background .1s;
+  }
+  .btn-add:hover { background: #1458c0; }
+  .table-wrap { overflow-x: auto; }
+  .crm-table { width: 100%; border-collapse: collapse; font-size: 12px; }
+  .crm-table th { text-align: left; padding: 8px 10px; font-size: 11px; font-weight: 600; color: var(--text-muted); border-bottom: 0.5px solid var(--border); white-space: nowrap; }
+  .crm-table td { padding: 10px 10px; border-bottom: 0.5px solid var(--border); vertical-align: middle; }
+  .crm-table tr:last-child td { border-bottom: none; }
+  .crm-table tbody tr:hover td { background: var(--bg); }
+  .crm-table .emp-name { font-weight: 500; font-size: 13px; }
+  .crm-table .emp-sector { font-size: 11px; color: var(--text-muted); }
+
+  /* BADGES */
+  .badge { display: inline-block; padding: 3px 9px; border-radius: 4px; font-size: 11px; font-weight: 500; white-space: nowrap; }
+  .badge.inv { background: var(--warning-bg); color: var(--warning-text); }
+  .badge.acc { background: var(--accent-bg); color: var(--accent-text); }
+  .badge.msg { background: var(--pro-bg); color: var(--pro-text); }
+  .badge.seg { background: var(--success-bg); color: var(--success-text); }
+  .badge.reu { background: var(--danger-bg); color: var(--danger-text); }
+  .badge.cot { background: #e8f4fb; color: #1060a0; }
+  .badge.ven { background: var(--success-bg); color: var(--success-text); border: 0.5px solid var(--success); }
+
+  /* MESSAGES */
+  .msg-list { display: flex; flex-direction: column; gap: 12px; }
+  .msg-card { background: var(--surface); border-radius: 12px; border: 0.5px solid var(--border); padding: 18px 20px; }
+  .msg-header { display: flex; align-items: center; gap: 8px; margin-bottom: 12px; }
+  .msg-step-badge { font-size: 11px; padding: 3px 10px; border-radius: 4px; background: var(--bg); color: var(--text-muted); border: 0.5px solid var(--border); font-weight: 500; }
+  .msg-name { font-size: 14px; font-weight: 500; }
+  .msg-body {
+    font-size: 13px; color: var(--text-sec); line-height: 1.7;
+    white-space: pre-line;
+    background: var(--bg); border-radius: var(--radius);
+    padding: 14px 16px;
+    border: 0.5px solid var(--border);
+  }
+  .btn-copy {
+    margin-top: 10px; font-size: 12px; padding: 5px 14px;
+    border: 0.5px solid var(--border-strong); border-radius: 4px;
+    background: var(--surface); color: var(--text-sec);
+    cursor: pointer; font-family: inherit; transition: background .1s;
+  }
+  .btn-copy:hover { background: var(--bg); }
+
+  /* KPIs */
+  .kpi-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+  .kpi-card { background: var(--surface); border-radius: 12px; border: 0.5px solid var(--border); padding: 18px 20px; }
+  .kpi-card-title { font-size: 11px; font-weight: 600; color: var(--text-muted); letter-spacing: .06em; margin-bottom: 14px; }
+  .kpi-row { display: flex; align-items: center; gap: 10px; padding: 6px 0; border-bottom: 0.5px solid var(--border); }
+  .kpi-row:last-child { border-bottom: none; }
+  .kpi-label { font-size: 12px; color: var(--text-sec); flex: 1; }
+  .kpi-bar-wrap { width: 80px; background: var(--bg); border-radius: 3px; height: 4px; flex-shrink: 0; }
+  .kpi-bar { height: 4px; border-radius: 3px; background: var(--accent); }
+  .kpi-val { font-size: 12px; font-weight: 500; min-width: 40px; text-align: right; }
+  .kpi-full { grid-column: 1 / -1; }
+  .tags { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 8px; }
+
+  /* MODAL */
+  .modal-bg {
+    display: none; position: fixed; inset: 0;
+    background: rgba(0,0,0,.35); z-index: 200;
+    align-items: flex-start; justify-content: center;
+    padding: 40px 16px; overflow-y: auto;
+  }
+  .modal-bg.open { display: flex; }
+  .modal {
+    background: var(--surface); border-radius: 12px;
+    border: 0.5px solid var(--border); padding: 24px;
+    width: 100%; max-width: 500px;
+    box-shadow: 0 8px 32px rgba(0,0,0,.14);
+  }
+  .modal-title { font-size: 16px; font-weight: 600; margin-bottom: 18px; }
+  .form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 10px; }
+  .form-group { display: flex; flex-direction: column; gap: 4px; }
+  .form-label { font-size: 11px; color: var(--text-muted); font-weight: 500; }
+  .form-input {
+    font-size: 13px; padding: 8px 10px;
+    border-radius: var(--radius); border: 0.5px solid var(--border);
+    background: var(--bg); color: var(--text);
+    font-family: inherit; outline: none; transition: border-color .15s;
+  }
+  .form-input:focus { border-color: var(--accent); background: var(--surface); }
+  .modal-actions { display: flex; gap: 8px; justify-content: flex-end; margin-top: 18px; }
+  .btn-cancel {
+    font-size: 13px; padding: 8px 16px;
+    background: none; color: var(--text-sec);
+    border: 0.5px solid var(--border); border-radius: var(--radius);
+    cursor: pointer; font-family: inherit;
+  }
+  .btn-save {
+    font-size: 13px; padding: 8px 18px;
+    background: var(--accent); color: #fff;
+    border: none; border-radius: var(--radius);
+    cursor: pointer; font-family: inherit;
+  }
+
+  /* Toasts */
+  .toast {
+    position: fixed; bottom: 24px; right: 24px;
+    background: var(--text); color: #fff;
+    font-size: 13px; padding: 10px 18px;
+    border-radius: var(--radius); z-index: 999;
+    opacity: 0; transform: translateY(8px);
+    transition: opacity .2s, transform .2s;
+    pointer-events: none;
+  }
+  .toast.show { opacity: 1; transform: translateY(0); }
+
+  @media (max-width: 600px) {
+    .sidebar { display: none; }
+    .metrics { grid-template-columns: 1fr 1fr; }
+    .kpi-grid { grid-template-columns: 1fr; }
+    .counters { grid-template-columns: 1fr 1fr; }
+    .form-row { grid-template-columns: 1fr; }
+  }
+</style>
+</head>
+<body>
+
+<div class="header">
+  <div class="logo">ITI<span>PERU</span> — Panel Comercial</div>
+  <div class="header-date" id="hoy-label"></div>
+</div>
+
+<div class="layout">
+
+  <nav class="sidebar">
+    <div class="nav-label">GESTIÓN</div>
+    <button class="nav-item active" onclick="showPanel('inicio',this)">
+      <span class="nav-icon">🏠</span> Inicio
+    </button>
+    <button class="nav-item" onclick="showPanel('flujo',this)">
+      <span class="nav-icon">↗</span> Flujo comercial
+    </button>
+    <button class="nav-item" onclick="showPanel('crm',this)">
+      <span class="nav-icon">📋</span> CRM
+    </button>
+    <div class="nav-label">HERRAMIENTAS</div>
+    <button class="nav-item" onclick="showPanel('mensajes',this)">
+      <span class="nav-icon">✉</span> Mensajes tipo
+    </button>
+    <button class="nav-item" onclick="showPanel('kpis',this)">
+      <span class="nav-icon">📊</span> KPIs semanales
+    </button>
+  </nav>
+
+  <main class="main">
+
+    <!-- ==================== INICIO ==================== -->
+    <div id="panel-inicio" class="panel active">
+      <div class="page-title">Buenos días 👋</div>
+      <div class="page-sub" id="sub-inicio">Registra tu actividad del día y sigue tu progreso.</div>
+
+      <div class="metrics">
+        <div class="metric accent">
+          <div class="metric-label">Empresas hoy</div>
+          <div class="metric-value" id="m-emp">0</div>
+          <div class="metric-sub">Meta: 30</div>
+        </div>
+        <div class="metric">
+          <div class="metric-label">Invitaciones</div>
+          <div class="metric-value" id="m-inv">0</div>
+          <div class="metric-sub">Meta: 20</div>
+        </div>
+        <div class="metric">
+          <div class="metric-label">Mensajes</div>
+          <div class="metric-value" id="m-msg">0</div>
+          <div class="metric-sub">Meta: 10</div>
+        </div>
+        <div class="metric success">
+          <div class="metric-label">Seguimientos</div>
+          <div class="metric-value" id="m-seg">0</div>
+          <div class="metric-sub">Meta: 10</div>
+        </div>
+      </div>
+
+      <div class="sec-title">PROGRESO DEL DÍA</div>
+      <div class="prog-list">
+        <div class="prog-item">
+          <div class="prog-header"><span>Empresas buscadas</span><span id="pl-emp">0 / 30</span></div>
+          <div class="prog-track"><div class="prog-bar" id="pb-emp" style="width:0%"></div></div>
+        </div>
+        <div class="prog-item">
+          <div class="prog-header"><span>Contactos agregados en LinkedIn</span><span id="pl-inv">0 / 20</span></div>
+          <div class="prog-track"><div class="prog-bar" id="pb-inv" style="width:0%"></div></div>
+        </div>
+        <div class="prog-item">
+          <div class="prog-header"><span>Mensajes enviados</span><span id="pl-msg">0 / 10</span></div>
+          <div class="prog-track"><div class="prog-bar" id="pb-msg" style="width:0%"></div></div>
+        </div>
+        <div class="prog-item">
+          <div class="prog-header"><span>Seguimientos realizados</span><span id="pl-seg">0 / 10</span></div>
+          <div class="prog-track"><div class="prog-bar" id="pb-seg" style="width:0%"></div></div>
+        </div>
+      </div>
+
+      <div class="sec-title">REGISTRAR ACTIVIDAD</div>
+      <div class="counters">
+        <div class="counter-card">
+          <div class="counter-title">Empresas buscadas</div>
+          <div class="counter-row">
+            <button class="counter-btn" onclick="daily('emp',-1)">−</button>
+            <div class="counter-num" id="n-emp">0</div>
+            <button class="counter-btn" onclick="daily('emp',1)">+</button>
+          </div>
+        </div>
+        <div class="counter-card">
+          <div class="counter-title">Invitaciones enviadas</div>
+          <div class="counter-row">
+            <button class="counter-btn" onclick="daily('inv',-1)">−</button>
+            <div class="counter-num" id="n-inv">0</div>
+            <button class="counter-btn" onclick="daily('inv',1)">+</button>
+          </div>
+        </div>
+        <div class="counter-card">
+          <div class="counter-title">Mensajes enviados</div>
+          <div class="counter-row">
+            <button class="counter-btn" onclick="daily('msg',-1)">−</button>
+            <div class="counter-num" id="n-msg">0</div>
+            <button class="counter-btn" onclick="daily('msg',1)">+</button>
+          </div>
+        </div>
+        <div class="counter-card">
+          <div class="counter-title">Seguimientos</div>
+          <div class="counter-row">
+            <button class="counter-btn" onclick="daily('seg',-1)">−</button>
+            <div class="counter-num" id="n-seg">0</div>
+            <button class="counter-btn" onclick="daily('seg',1)">+</button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ==================== FLUJO ==================== -->
+    <div id="panel-flujo" class="panel">
+      <div class="page-title">Flujo comercial</div>
+      <div class="page-sub">Sigue los 9 pasos del proceso de ventas ITIPERU paso a paso.</div>
+      <div class="flow" id="flow-container"></div>
+    </div>
+
+    <!-- ==================== CRM ==================== -->
+    <div id="panel-crm" class="panel">
+      <div class="page-title">CRM de prospectos</div>
+      <div class="page-sub">Registro y seguimiento de empresas contactadas.</div>
+      <div class="crm-toolbar">
+        <input type="text" id="crm-search" placeholder="Buscar empresa o contacto..." oninput="renderCRM()">
+        <select id="crm-filter" onchange="renderCRM()">
+          <option value="">Todos los estados</option>
+          <option>Invitación enviada</option>
+          <option>Conectado</option>
+          <option>Mensaje enviado</option>
+          <option>Seguimiento</option>
+          <option>Reunión agendada</option>
+          <option>Cotización</option>
+          <option>Venta</option>
+        </select>
+        <button class="btn-add" onclick="openModal()">+ Nuevo contacto</button>
+      </div>
+      <div class="table-wrap">
+        <table class="crm-table">
+          <thead>
+            <tr>
+              <th>Empresa</th>
+              <th>Contacto</th>
+              <th>Cargo</th>
+              <th>LinkedIn</th>
+              <th>Estado</th>
+              <th>Fecha</th>
+              <th>Próx. seguimiento</th>
+            </tr>
+          </thead>
+          <tbody id="crm-body"></tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- ==================== MENSAJES ==================== -->
+    <div id="panel-mensajes" class="panel">
+      <div class="page-title">Mensajes tipo</div>
+      <div class="page-sub">Mensajes listos para personalizar y copiar. Reemplaza [Nombre] por el nombre del contacto.</div>
+      <div class="msg-list" id="msg-container"></div>
+    </div>
+
+    <!-- ==================== KPIs ==================== -->
+    <div id="panel-kpis" class="panel">
+      <div class="page-title">KPIs semanales</div>
+      <div class="page-sub">Metas semanales y sectores / cargos objetivo de ITIPERU.</div>
+      <div class="kpi-grid">
+        <div class="kpi-card">
+          <div class="kpi-card-title">ACTIVIDAD SEMANAL</div>
+          <div class="kpi-row">
+            <span class="kpi-label">Empresas encontradas</span>
+            <div class="kpi-bar-wrap"><div class="kpi-bar" id="kw1" style="width:0%"></div></div>
+            <span class="kpi-val" id="kv1">0 / 120</span>
+          </div>
+          <div class="kpi-row">
+            <span class="kpi-label">Invitaciones enviadas</span>
+            <div class="kpi-bar-wrap"><div class="kpi-bar" id="kw2" style="width:0%"></div></div>
+            <span class="kpi-val" id="kv2">0 / 100</span>
+          </div>
+          <div class="kpi-row">
+            <span class="kpi-label">Invitaciones aceptadas</span>
+            <div class="kpi-bar-wrap"><div class="kpi-bar" id="kw3" style="width:0%"></div></div>
+            <span class="kpi-val" id="kv3">0 / 40</span>
+          </div>
+          <div class="kpi-row">
+            <span class="kpi-label">Mensajes enviados</span>
+            <div class="kpi-bar-wrap"><div class="kpi-bar" id="kw4" style="width:0%"></div></div>
+            <span class="kpi-val" id="kv4">0 / 40</span>
+          </div>
+        </div>
+        <div class="kpi-card">
+          <div class="kpi-card-title">CONVERSIÓN</div>
+          <div class="kpi-row">
+            <span class="kpi-label">Respuestas recibidas</span>
+            <div class="kpi-bar-wrap"><div class="kpi-bar" id="kw5" style="width:0%"></div></div>
+            <span class="kpi-val" id="kv5">0 / 15</span>
+          </div>
+          <div class="kpi-row">
+            <span class="kpi-label">Reuniones agendadas</span>
+            <div class="kpi-bar-wrap"><div class="kpi-bar" id="kw6" style="width:0%"></div></div>
+            <span class="kpi-val" id="kv6">0 / 5</span>
+          </div>
+          <div class="kpi-row">
+            <span class="kpi-label">Cotizaciones enviadas</span>
+            <div class="kpi-bar-wrap"><div class="kpi-bar" id="kw7" style="width:0%"></div></div>
+            <span class="kpi-val" id="kv7">0 / 3</span>
+          </div>
+          <div class="kpi-row">
+            <span class="kpi-label">Ventas cerradas</span>
+            <div class="kpi-bar-wrap"><div class="kpi-bar" id="kw8" style="width:0%"></div></div>
+            <span class="kpi-val" id="kv8">0 / 1</span>
+          </div>
+        </div>
+
+        <div class="kpi-card kpi-full">
+          <div class="kpi-card-title">SECTORES OBJETIVO</div>
+          <div class="tags">
+            <span class="badge acc">Agroindustria</span>
+            <span class="badge msg">Municipalidades</span>
+            <span class="badge seg">Institutos</span>
+            <span class="badge inv">Colegios</span>
+            <span class="badge reu">Clínicas</span>
+            <span class="badge cot">Constructoras</span>
+            <span class="badge acc">Transporte</span>
+            <span class="badge msg">Manufactura</span>
+            <span class="badge seg">Minería</span>
+            <span class="badge inv">Comercio</span>
+          </div>
+          <div class="kpi-card-title" style="margin-top:18px;">CARGOS OBJETIVO</div>
+          <div class="tags">
+            <span class="badge acc">Gerente General</span>
+            <span class="badge msg">Gerente de TI</span>
+            <span class="badge seg">Administrador</span>
+            <span class="badge inv">Jefe de Sistemas</span>
+            <span class="badge reu">Jefe de Operaciones</span>
+            <span class="badge cot">Gerente Administrativo</span>
+            <span class="badge acc">Director</span>
+          </div>
+          <div class="kpi-card-title" style="margin-top:18px;">SOLUCIONES ITIPERU</div>
+          <div class="tags">
+            <span class="badge acc">Ciberseguridad</span>
+            <span class="badge msg">Outsourcing TI</span>
+            <span class="badge seg">Transformación Digital</span>
+            <span class="badge inv">Inteligencia Artificial</span>
+            <span class="badge reu">Consultoría TI</span>
+          </div>
+        </div>
+
+        <div class="kpi-card kpi-full">
+          <div class="kpi-card-title">INGRESAR KPIs SEMANALES</div>
+          <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:8px;">
+            <div class="form-group">
+              <label class="form-label">Empresas</label>
+              <input class="form-input" type="number" min="0" id="kf1" placeholder="0" oninput="updateKPI()">
+            </div>
+            <div class="form-group">
+              <label class="form-label">Invitaciones</label>
+              <input class="form-input" type="number" min="0" id="kf2" placeholder="0" oninput="updateKPI()">
+            </div>
+            <div class="form-group">
+              <label class="form-label">Aceptadas</label>
+              <input class="form-input" type="number" min="0" id="kf3" placeholder="0" oninput="updateKPI()">
+            </div>
+            <div class="form-group">
+              <label class="form-label">Mensajes</label>
+              <input class="form-input" type="number" min="0" id="kf4" placeholder="0" oninput="updateKPI()">
+            </div>
+            <div class="form-group">
+              <label class="form-label">Respuestas</label>
+              <input class="form-input" type="number" min="0" id="kf5" placeholder="0" oninput="updateKPI()">
+            </div>
+            <div class="form-group">
+              <label class="form-label">Reuniones</label>
+              <input class="form-input" type="number" min="0" id="kf6" placeholder="0" oninput="updateKPI()">
+            </div>
+            <div class="form-group">
+              <label class="form-label">Cotizaciones</label>
+              <input class="form-input" type="number" min="0" id="kf7" placeholder="0" oninput="updateKPI()">
+            </div>
+            <div class="form-group">
+              <label class="form-label">Ventas</label>
+              <input class="form-input" type="number" min="0" id="kf8" placeholder="0" oninput="updateKPI()">
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+  </main>
+</div>
+
+<!-- MODAL NUEVO CONTACTO -->
+<div class="modal-bg" id="modal">
+  <div class="modal">
+    <div class="modal-title">Nuevo contacto</div>
+    <div class="form-row">
+      <div class="form-group">
+        <label class="form-label">Empresa *</label>
+        <input class="form-input" id="f-empresa" placeholder="Empresa ABC">
+      </div>
+      <div class="form-group">
+        <label class="form-label">Sector</label>
+        <select class="form-input" id="f-sector">
+          <option>Agroindustria</option><option>Municipalidades</option><option>Institutos</option>
+          <option>Colegios</option><option>Clínicas</option><option>Constructoras</option>
+          <option>Transporte</option><option>Manufactura</option><option>Minería</option><option>Comercio</option>
+        </select>
+      </div>
+    </div>
+    <div class="form-row">
+      <div class="form-group">
+        <label class="form-label">Nombre del contacto</label>
+        <input class="form-input" id="f-contacto" placeholder="Juan Pérez">
+      </div>
+      <div class="form-group">
+        <label class="form-label">Cargo</label>
+        <select class="form-input" id="f-cargo">
+          <option>Gerente General</option><option>Gerente de TI</option><option>Administrador</option>
+          <option>Jefe de Sistemas</option><option>Jefe de Operaciones</option>
+          <option>Gerente Administrativo</option><option>Director</option>
+        </select>
+      </div>
+    </div>
+    <div class="form-row">
+      <div class="form-group">
+        <label class="form-label">LinkedIn</label>
+        <select class="form-input" id="f-linkedin"><option>Sí</option><option>No</option></select>
+      </div>
+      <div class="form-group">
+        <label class="form-label">Estado</label>
+        <select class="form-input" id="f-estado">
+          <option>Invitación enviada</option><option>Conectado</option>
+          <option>Mensaje enviado</option><option>Seguimiento</option>
+          <option>Reunión agendada</option><option>Cotización</option><option>Venta</option>
+        </select>
+      </div>
+    </div>
+    <div class="form-row">
+      <div class="form-group">
+        <label class="form-label">Fecha de contacto</label>
+        <input class="form-input" type="date" id="f-fecha">
+      </div>
+      <div class="form-group">
+        <label class="form-label">Próximo seguimiento</label>
+        <input class="form-input" type="date" id="f-prox">
+      </div>
+    </div>
+    <div class="form-group">
+      <label class="form-label">Notas</label>
+      <input class="form-input" id="f-notas" placeholder="Observaciones adicionales...">
+    </div>
+    <div class="modal-actions">
+      <button class="btn-cancel" onclick="closeModal()">Cancelar</button>
+      <button class="btn-save" onclick="saveContact()">Guardar contacto</button>
+    </div>
+  </div>
+</div>
+
+<!-- TOAST -->
+<div class="toast" id="toast"></div>
+
+<script>
+// ── DATA ──────────────────────────────────────────────
+const FLUJO_STEPS = [
+  { title:"Buscar empresas", desc:"Buscar 30 empresas diarias en sectores: Agroindustria, Municipalidades, Institutos, Colegios, Clínicas, Constructoras, Empresas de transporte, Manufactura, Minería y Comercio." },
+  { title:"Buscar gerentes / jefes en LinkedIn", desc:"Identificar contactos clave: Gerente General, Gerente de TI, Administrador, Jefe de Sistemas, Jefe de Operaciones, Gerente Administrativo, Director." },
+  { title:"Enviar solicitud de conexión", desc:"Solo conectar, no vender. Adjuntar nota de presentación personal como parte del equipo comercial de ITIPERU. Enviar 20 invitaciones por día." },
+  { title:"Esperar que acepte (1–2 días)", desc:"No insistir inmediatamente. Esperar la aceptación del contacto antes de enviar el mensaje de presentación." },
+  { title:"Enviar mensaje de presentación", desc:"Presentar las soluciones ITIPERU: Ciberseguridad, Outsourcing de Soporte TI, Transformación Digital, Inteligencia Artificial y Consultoría TI. Enviar 10 mensajes por día." },
+  { title:"Seguimiento", desc:"Esperar respuesta sin insistir. Luego consultar si tienen proyectos relacionados con Ciberseguridad, Soporte TI o Transformación Digital. Proponer reunión virtual de 20 minutos sin compromiso." },
+  { title:"Agendar reunión con Carlos", desc:"Si el prospecto responde favorablemente, María agenda la reunión virtual de 20 minutos con el consultor Carlos." },
+  { title:"Carlos realiza la presentación", desc:"Reunión de presentación de soluciones ITIPERU personalizada según las necesidades del cliente prospecto." },
+  { title:"Cotización y cierre", desc:"Elaborar y enviar propuesta económica. Negociación y firma del contrato de servicios." },
+];
+
+const MENSAJES = [
+  {
+    step:"Paso 3",
+    title:"Mensaje de invitación en LinkedIn",
+    body:`Hola, [Nombre].
+
+Un gusto saludarlo. Soy parte del equipo comercial de ITIPERU. Me gustaría agregarlo a mi red profesional y compartir contenido relacionado con transformación digital, ciberseguridad e innovación tecnológica.
+
+Saludos.`
+  },
+  {
+    step:"Paso 5",
+    title:"Mensaje de presentación (tras aceptar)",
+    body:`Hola, [Nombre].
+
+Muchas gracias por aceptar mi invitación.
+
+En ITIPERU ayudamos a empresas a fortalecer su infraestructura tecnológica mediante soluciones de:
+✔ Ciberseguridad
+✔ Outsourcing de Soporte TI
+✔ Transformación Digital
+✔ Inteligencia Artificial
+✔ Consultoría TI
+
+Si en algún momento requieren apoyo tecnológico, estaré encantada de coordinar una reunión con nuestro consultor.
+
+Saludos.`
+  },
+  {
+    step:"Paso 6",
+    title:"Mensaje de seguimiento",
+    body:`Hola, [Nombre].
+
+Espero que se encuentre muy bien.
+
+Quería consultarle si actualmente su empresa tiene algún proyecto relacionado con:
+• Ciberseguridad
+• Soporte TI
+• Transformación Digital
+
+Con gusto podemos coordinar una reunión virtual de 20 minutos sin compromiso.
+
+Saludos.`
+  },
+];
+
+let contacts = [
+  { empresa:"Empresa ABC", sector:"Agroindustria", contacto:"Juan Pérez", cargo:"Gerente General", linkedin:"Sí", estado:"Invitación enviada", fecha:"30/06/2026", prox:"03/07/2026", notas:"" },
+  { empresa:"Clínica Norte", sector:"Clínicas", contacto:"Ana Torres", cargo:"Administrador", linkedin:"Sí", estado:"Conectado", fecha:"28/06/2026", prox:"01/07/2026", notas:"Aceptó rápido" },
+  { empresa:"Constructora Sur", sector:"Constructoras", contacto:"Carlos Ríos", cargo:"Gerente de TI", linkedin:"Sí", estado:"Mensaje enviado", fecha:"27/06/2026", prox:"30/06/2026", notas:"" },
+  { empresa:"Instituto Técnico Lima", sector:"Institutos", contacto:"Rosa Vargas", cargo:"Director", linkedin:"Sí", estado:"Seguimiento", fecha:"25/06/2026", prox:"02/07/2026", notas:"Interesado en soporte TI" },
+];
+
+let stepActive = 0;
+const stepDone = new Set();
+const dailyCount = { emp:0, inv:0, msg:0, seg:0 };
+const KPI_METAS = [120, 100, 40, 40, 15, 5, 3, 1];
+const BADGE_CLASS = { "Invitación enviada":"inv","Conectado":"acc","Mensaje enviado":"msg","Seguimiento":"seg","Reunión agendada":"reu","Cotización":"cot","Venta":"ven" };
+
+// ── NAVIGATION ────────────────────────────────────────
+function showPanel(name, btn) {
+  document.querySelectorAll('.panel').forEach(p => p.classList.remove('active'));
+  document.querySelectorAll('.nav-item').forEach(b => b.classList.remove('active'));
+  document.getElementById('panel-'+name).classList.add('active');
+  if(btn) btn.classList.add('active');
+}
+
+// ── HEADER DATE ───────────────────────────────────────
+function initDate() {
+  const days = ['domingo','lunes','martes','miércoles','jueves','viernes','sábado'];
+  const months = ['enero','febrero','marzo','abril','mayo','junio','julio','agosto','septiembre','octubre','noviembre','diciembre'];
+  const now = new Date();
+  const label = `${days[now.getDay()]}, ${now.getDate()} de ${months[now.getMonth()]} de ${now.getFullYear()}`;
+  document.getElementById('hoy-label').textContent = label;
+  document.getElementById('sub-inicio').textContent = `${label} — registra tu actividad y sigue tu progreso.`;
+}
+
+// ── DAILY COUNTERS ────────────────────────────────────
+const DAILY_METAS = { emp:30, inv:20, msg:10, seg:10 };
+function daily(k, d) {
+  dailyCount[k] = Math.max(0, dailyCount[k]+d);
+  const v = dailyCount[k];
+  const meta = DAILY_METAS[k];
+  document.getElementById('n-'+k).textContent = v;
+  document.getElementById('m-'+k).textContent = v;
+  const pct = Math.min(100, Math.round(v/meta*100));
+  document.getElementById('pb-'+k).style.width = pct+'%';
+  document.getElementById('pl-'+k).textContent = v+' / '+meta;
+  if(pct >= 100) document.getElementById('pb-'+k).classList.add('success');
+}
+
+// ── FLOW ──────────────────────────────────────────────
+function renderFlow() {
+  const c = document.getElementById('flow-container');
+  c.innerHTML = FLUJO_STEPS.map((s,i) => {
+    const done = stepDone.has(i);
+    const active = i === stepActive;
+    const dotClass = done ? 'done' : (active ? 'active' : '');
+    const cardClass = active ? ' active' : (done ? ' done' : '');
+    const actions = active ? `<div class="flow-actions"><button class="btn-done" onclick="markDone(${i})">✓ Marcar como hecho</button></div>` : '';
+    return `
+      <div class="flow-row">
+        <div class="flow-left">
+          <div class="flow-dot ${dotClass}"></div>
+          ${i < FLUJO_STEPS.length-1 ? '<div class="flow-line"></div>' : ''}
+        </div>
+        <div class="flow-card${cardClass}" onclick="setStep(${i})">
+          <div class="flow-num">Paso ${i+1} de ${FLUJO_STEPS.length}</div>
+          <div class="flow-title">${s.title}</div>
+          <div class="flow-desc">${s.desc}</div>
+          ${actions}
+        </div>
+      </div>`;
+  }).join('');
+}
+function setStep(i) { stepActive = i; renderFlow(); }
+function markDone(i) {
+  stepDone.add(i);
+  if(i < FLUJO_STEPS.length-1) stepActive = i+1;
+  renderFlow();
+  toast('Paso marcado como hecho ✓');
+}
+
+// ── CRM ───────────────────────────────────────────────
+function renderCRM() {
+  const q = document.getElementById('crm-search').value.toLowerCase();
+  const est = document.getElementById('crm-filter').value;
+  const rows = contacts.filter(c =>
+    (!q || c.empresa.toLowerCase().includes(q) || c.contacto.toLowerCase().includes(q)) &&
+    (!est || c.estado === est)
+  );
+  const body = document.getElementById('crm-body');
+  if(!rows.length) {
+    body.innerHTML = '<tr><td colspan="7" style="text-align:center;color:var(--text-muted);padding:24px">Sin resultados para ese filtro.</td></tr>';
+    return;
+  }
+  body.innerHTML = rows.map(c => `<tr>
+    <td>
+      <div class="emp-name">${c.empresa}</div>
+      <div class="emp-sector">${c.sector}</div>
+    </td>
+    <td>${c.contacto}</td>
+    <td style="color:var(--text-sec)">${c.cargo}</td>
+    <td style="text-align:center">${c.linkedin === 'Sí' ? '✓' : '—'}</td>
+    <td><span class="badge ${BADGE_CLASS[c.estado]||'acc'}">${c.estado}</span></td>
+    <td style="color:var(--text-muted);white-space:nowrap">${c.fecha}</td>
+    <td style="color:var(--text-muted);white-space:nowrap">${c.prox}</td>
+  </tr>`).join('');
+}
+
+// ── MODAL ─────────────────────────────────────────────
+function openModal() {
+  const today = new Date().toISOString().split('T')[0];
+  const prox = new Date(); prox.setDate(prox.getDate()+3);
+  document.getElementById('f-fecha').value = today;
+  document.getElementById('f-prox').value = prox.toISOString().split('T')[0];
+  document.getElementById('modal').classList.add('open');
+}
+function closeModal() { document.getElementById('modal').classList.remove('open'); }
+function saveContact() {
+  const empresa = document.getElementById('f-empresa').value.trim();
+  if(!empresa) { document.getElementById('f-empresa').focus(); return; }
+  const fmt = d => { if(!d) return '—'; const [y,m,dd]=d.split('-'); return `${dd}/${m}/${y}`; };
+  contacts.unshift({
+    empresa,
+    sector:    document.getElementById('f-sector').value,
+    contacto:  document.getElementById('f-contacto').value || '—',
+    cargo:     document.getElementById('f-cargo').value,
+    linkedin:  document.getElementById('f-linkedin').value,
+    estado:    document.getElementById('f-estado').value,
+    fecha:     fmt(document.getElementById('f-fecha').value),
+    prox:      fmt(document.getElementById('f-prox').value),
+    notas:     document.getElementById('f-notas').value,
+  });
+  closeModal(); renderCRM();
+  ['f-empresa','f-contacto','f-notas'].forEach(id => document.getElementById(id).value='');
+  toast('Contacto guardado');
+}
+document.getElementById('modal').addEventListener('click', e => { if(e.target===e.currentTarget) closeModal(); });
+
+// ── MESSAGES ─────────────────────────────────────────
+function renderMessages() {
+  document.getElementById('msg-container').innerHTML = MENSAJES.map((m,i) => `
+    <div class="msg-card">
+      <div class="msg-header">
+        <span class="badge acc msg-step-badge">${m.step}</span>
+        <span class="msg-name">${m.title}</span>
+      </div>
+      <div class="msg-body">${m.body}</div>
+      <button class="btn-copy" id="cp-${i}" onclick="copyMsg(${i})">Copiar mensaje</button>
+    </div>`).join('');
+}
+function copyMsg(i) {
+  navigator.clipboard.writeText(MENSAJES[i].body).then(() => {
+    const btn = document.getElementById('cp-'+i);
+    const orig = btn.textContent;
+    btn.textContent = '¡Copiado!';
+    setTimeout(() => btn.textContent = orig, 1800);
+    toast('Mensaje copiado al portapapeles');
+  });
+}
+
+// ── KPIs ──────────────────────────────────────────────
+function updateKPI() {
+  [1,2,3,4,5,6,7,8].forEach(n => {
+    const val = parseInt(document.getElementById('kf'+n).value) || 0;
+    const meta = KPI_METAS[n-1];
+    const pct = Math.min(100, Math.round(val/meta*100));
+    document.getElementById('kw'+n).style.width = pct+'%';
+    document.getElementById('kv'+n).textContent = val+' / '+meta;
+  });
+}
+
+// ── TOAST ─────────────────────────────────────────────
+function toast(msg) {
+  const el = document.getElementById('toast');
+  el.textContent = msg;
+  el.classList.add('show');
+  setTimeout(() => el.classList.remove('show'), 2200);
+}
+
+// ── INIT ──────────────────────────────────────────────
+initDate();
+renderFlow();
+renderCRM();
+renderMessages();
+</script>
+</body>
+</html>
